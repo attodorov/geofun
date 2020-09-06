@@ -32,8 +32,10 @@ class StoresHandler(APIHandler):
             if postcode not in self.postcodemap:
                 # get from postcodes.io, it may be something that didn't exist initially
                 postcode_geoloc = self.get_geoloc(postcode)
+                # cache so that we don't call postcodes.io again
+                self.postcodemap[postcode] = {"latitude": postcode_geoloc[0], "longitude": postcode_geoloc[1]}
             else:
-                postcode_geoloc = (self.postcodemap[postcode].latitude, self.postcodemap[postcode].longitude)
+                postcode_geoloc = (self.postcodemap[postcode]["latitude"], self.postcodemap[postcode]["longitude"])
             # now iterate through cached distances, if we don't have the distance between two codes already
             # then calculate it and cache it 
             for store in self.storesextended:
@@ -121,18 +123,19 @@ class StoresJSONHandler(StoresHandler):
             respjson = json.load(resp)
             for res in respjson["result"]:
                 if (res["result"]):
-                    self.postcodemap[res["query"]] = {
+                    self.postcodemap[res["query"].replace(" ", "")] = {
                         "latitude": res["result"]["latitude"],
                         "longitude": res["result"]["longitude"]
                     }
         except Exception as e: 
             print("Error occured while loading postcodes from postcodes.io: ", str(e))
         for store in self.stores:
+            pcode = store["postcode"].replace(" ", "")
             self.storesextended.append({
                 "name": store["name"], 
                 "postcode": store["postcode"], 
-                "latitude": self.postcodemap[store["postcode"]]["latitude"] if store["postcode"] in self.postcodemap else None,
-                "longitude": self.postcodemap[store["postcode"]]["longitude"] if store["postcode"] in self.postcodemap else None,
+                "latitude": self.postcodemap[pcode]["latitude"] if pcode in self.postcodemap else None,
+                "longitude": self.postcodemap[pcode]["longitude"] if pcode in self.postcodemap else None,
             })
     # if this class is declared in config.py, will be called by RouteHandler's constructor
     def register_routes(self):
