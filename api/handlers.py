@@ -7,6 +7,7 @@ from math import sin, cos, sqrt, atan2, radians
 # i.e. stores module, something_else module
 GET_STORES_PATH = "/api/stores"
 GET_NEAREST_STORES_PATH = "/api/neareststores"
+SEARCH_STORES_PATH = "/api/searchstores"
 
 class APIHandler:
     def register_routes(self):
@@ -18,13 +19,13 @@ class StoresHandler(APIHandler):
     storesextended = []
     # ideally this should be a true graph. key is code1:code2 (pair of codes), value is the distance
     cacheddistances = {}
-    def get_stores(self):
+    def get_stores(self, get_params, query_params):
         return self.storesextended
-    def get_nearest_stores(self, get_params):
+    def get_nearest_stores(self, get_params, query_params):
         try :
             matching_stores = []
             postcode = get_params[0] # let's assume it's valid. 
-            # if it can't be converted to int will propagate exception up
+            # if it can't be converted to float will propagate exception up
             radius = float(get_params[1])
             postcode_geoloc = (None, None)
             if postcode not in self.postcodemap:
@@ -71,6 +72,18 @@ class StoresHandler(APIHandler):
         a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
         c = 2 * atan2(sqrt(a), sqrt(1 - a))
         return R * c
+    def search_stores(self, get_params, query_params):
+        params = {}
+        for p in query_params.split('&'):
+            qp = p.split('=')
+            if len(qp) == 2:
+                params[qp[0]] = qp[1]
+        if "query" in params and len(params["query"]) > 0:
+            query = params["query"]
+            return list(filter(lambda x: query in x["postcode"].lower() or query in x["name"].lower(), self.storesextended))
+        else:
+            # return all because query string not supplied or empty
+            return self.storesextended
 
 # JSON specific handler for stores operations.
 # if we were to have a Postgres-enabled handler, it would be reading sql tables here
@@ -111,3 +124,4 @@ class StoresJSONHandler(StoresHandler):
     def register_routes(self):
         config.registered_routes[GET_STORES_PATH] = self.get_stores
         config.registered_routes[GET_NEAREST_STORES_PATH] = self.get_nearest_stores
+        config.registered_routes[SEARCH_STORES_PATH] = self.search_stores
