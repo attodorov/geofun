@@ -14,11 +14,12 @@ class APIHandler:
         pass
 
 class StoresHandler(APIHandler):
-    stores = []
-    postcodemap = {}
-    storesextended = []
-    # ideally this should be a true graph. key is code1:code2 (pair of codes), value is the distance
-    cacheddistances = {}
+    def __init__(self):
+        self.stores = []
+        self.postcodemap = {}
+        self.storesextended = []
+        # ideally this should be a true graph. key is code1:code2 (pair of codes), value is the distance
+        self.cacheddistances = {}
     def get_stores(self, get_params, query_params):
         return self.storesextended
     def get_nearest_stores(self, get_params, query_params):
@@ -79,7 +80,7 @@ class StoresHandler(APIHandler):
             if len(qp) == 2:
                 params[qp[0]] = qp[1]
         if "query" in params and len(params["query"]) > 0:
-            query = params["query"]
+            query = params["query"].lower()
             #postcode_matches = list(filter(lambda x: query in x["postcode"].lower(), self.storesextended))
             #city_matches = list(filter(lambda x: query in x["name"].lower(), self.storesextended))
             # do this with a proper loop. only one loop, the above code does two loops over the same data.
@@ -103,6 +104,7 @@ class StoresHandler(APIHandler):
 class StoresJSONHandler(StoresHandler):
     stores_json_path = "data/stores.json"
     def __init__(self):
+        super().__init__()
         # open stores.json for reading and load it into the stores variable
         with open(self.stores_json_path, "r") as stores_data:
             self.stores = json.load(stores_data)
