@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Stores Index</title>
+    <link rel = "stylesheet" type = "text/css" href = "css/app.css" />
+    <script type="text/javascript" src="js/app.js"></script>
+  </head>
+  <body>
+    <h1 class="mainheader"> Stores </h1>
+    <!-- we will get this DOM element and clone it and append to the storelist -->
+    <div id="storetemplate" style="display:none">
+        <div class="store row">
+            <div class="col">${name}</div>
+            <div class="col">Lat: ${latitude}, Lon: ${longitude}</div>
+        </div>
+    </div>
+    <div id="storeslist">
+        <!-- placeholder for generated stores html after evaluation with template and json data -->
+    </div>
+  </body>
+</html>

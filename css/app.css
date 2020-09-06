@@ -1,0 +1,15 @@
+.mainheader {
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+}
+.store {
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+}
+.row {
+    display:block;
+    padding: 10px;
+}
+.col {
+    display:inline-block;
+    width:20%;
+    font-weight:500;
+}
