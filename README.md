@@ -5,4 +5,7 @@ python server.py
 #assumptions
 
  - distance is in km (not miles)
+
+ #Unit tests: 
  
+ python3 -m unittest tests/tests.py 
