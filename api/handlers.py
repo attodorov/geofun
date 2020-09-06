@@ -1,10 +1,12 @@
 import json
 import config
 import urllib.request
+from math import sin, cos, sqrt, atan2, radians
 
 # we can additionally improve this by splitting handlers into modules
 # i.e. stores module, something_else module
-GET_STORES_PATH = "/data/stores"
+GET_STORES_PATH = "/api/stores"
+GET_NEAREST_STORES_PATH = "/api/neareststores"
 
 class APIHandler:
     def register_routes(self):
@@ -14,8 +16,61 @@ class StoresHandler(APIHandler):
     stores = []
     postcodemap = {}
     storesextended = []
+    # ideally this should be a true graph. key is code1:code2 (pair of codes), value is the distance
+    cacheddistances = {}
     def get_stores(self):
         return self.storesextended
+    def get_nearest_stores(self, get_params):
+        try :
+            matching_stores = []
+            postcode = get_params[0] # let's assume it's valid. 
+            # if it can't be converted to int will propagate exception up
+            radius = float(get_params[1])
+            postcode_geoloc = (None, None)
+            if postcode not in self.postcodemap:
+                # get from postcodes.io, it may be something that didn't exist initially
+                postcode_geoloc = self.get_geoloc(postcode)
+            else:
+                postcode_geoloc = (self.postcodemap[postcode].latitude, self.postcodemap[postcode].longitude)
+            # now iterate through cached distances, if we don't have the distance between two codes already
+            # then calculate it and cache it 
+            for store in self.storesextended:
+                if store["latitude"] is None:
+                    continue # can't process anything that does not have lat and lon
+                key = postcode + ":" + store["postcode"]
+                if key not in self.cacheddistances:
+                    distance = self.get_distance(postcode_geoloc, (store["latitude"], store["longitude"]))
+                    self.cacheddistances[key] = distance # cache
+                distance = self.cacheddistances[key]
+                if (distance <= radius):
+                    matching_stores.append(store)
+            # finally sort north to south (that is, by latitude value DESC)
+            # 90 is north pole, -90 is south pole, 0 is equator. 
+            matching_stores.sort(key=lambda x: x["latitude"], reverse=True)
+            return matching_stores
+        except Exception as e:
+            raise Exception("Could not get nearest stores, please check if you have supplied valid params. Syntax <url>/api/neareststores/< valid UK postcode>/<radius km>: " + str(e))
+    def get_geoloc(self, postcode):
+            try:
+                resp = urllib.request.urlopen("https://api.postcodes.io/postcodes/" + postcode)
+                ret = json.load(resp)
+                if (ret["result"] is None):
+                    raise Exception("supplied postcode not found/invalid")
+                return (ret["result"]["latitude"], ret["result"]["longitude"])
+            except Exception as e:
+                raise e
+    def get_distance(self, loc1, loc2):
+        # https://stackoverflow.com/questions/19412462/getting-distance-between-two-points-based-on-latitude-longitude/43211266#43211266
+        R = 6373.0
+        lat1 = radians(loc1[0])
+        lon1 = radians(loc1[1])
+        lat2 = radians(loc2[0])
+        lon2 = radians(loc2[1])
+        dlon = lon2 - lon1
+        dlat = lat2 - lat1
+        a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+        c = 2 * atan2(sqrt(a), sqrt(1 - a))
+        return R * c
 
 # JSON specific handler for stores operations.
 # if we were to have a Postgres-enabled handler, it would be reading sql tables here
@@ -55,3 +110,4 @@ class StoresJSONHandler(StoresHandler):
     # if this class is declared in config.py, will be called by RouteHandler's constructor
     def register_routes(self):
         config.registered_routes[GET_STORES_PATH] = self.get_stores
+        config.registered_routes[GET_NEAREST_STORES_PATH] = self.get_nearest_stores

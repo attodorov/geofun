@@ -1,3 +1,5 @@
+GET_STORES_URL = "/api/stores";
+
 function eval_template(tmpl, dataitem) {
     // this is a pseudo generic templating engine implemented with minimal code 
     // it gets parameterized props from the template and replaces with the values
@@ -23,7 +25,7 @@ window.onload = function() {
     // in a prod. env (and not only, in any bigger app)  this will most certainly 
     // run at on different hosts or least on different ports
     var req = new XMLHttpRequest();
-    req.open("GET", "/data/stores", true);
+    req.open("GET", GET_STORES_URL, true);
     req.onreadystatechange = function () {
         if (req.readyState == 4 && req.status == "200") {
             var storesData = JSON.parse(req.responseText);
