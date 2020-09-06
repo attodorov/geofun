@@ -6,10 +6,35 @@
 }
 .row {
     display:block;
-    padding: 10px;
+    padding: 20px;
+    height:40px;
+    border-bottom: 1px solid lightgray;
 }
 .col {
     display:inline-block;
-    width:20%;
+    width:40%;
     font-weight:500;
+}
+
+.config {
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-weight:500;
+}
+
+.storeslist-container {
+    height: 200px;
+    width: 50%;
+    border: 1px solid gray;
+    overflow-y:auto;
+}
+
+.searchbox {
+    height:30px;
+    width:200px;
+}
+
+.note {
+    font-style: italic;
+    font-weight:400;
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
 }

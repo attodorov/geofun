@@ -83,15 +83,19 @@ class StoresHandler(APIHandler):
                 params[qp[0]] = qp[1]
         if "query" in params and len(params["query"]) > 0:
             query = params["query"].lower()
+            # check how we are going to compare, with indexof/contains or startswith
+            contains_matching = True
+            if "type" in params and params["type"] == "startswith":
+                contains_matching = False
             #postcode_matches = list(filter(lambda x: query in x["postcode"].lower(), self.storesextended))
             #city_matches = list(filter(lambda x: query in x["name"].lower(), self.storesextended))
             # do this with a proper loop. only one loop, the above code does two loops over the same data.
             postcode_matches = []
             city_matches = []
             for store in self.storesextended:
-                if query in store["postcode"].lower():
+                if (contains_matching and query in store["postcode"].lower()) or store["postcode"].lower().startswith(query):
                     postcode_matches.append(store)
-                if query in store["name"].lower():
+                if (contains_matching and query in store["name"].lower()) or store["name"].lower().startswith(query):
                     city_matches.append(store)
             # merge results such that postcodes are always sorted with priority 
             # on top of cities

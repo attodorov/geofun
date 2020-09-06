@@ -7,7 +7,9 @@
     <script type="text/javascript" src="js/app.js"></script>
   </head>
   <body>
-    <h1 class="mainheader"> Stores </h1>
+    <h1 class="mainheader"> Stores</h1>
+    <h3 class="mainheader">Demonstrates initial load, delayed search/autosuggest and load on demand on scroll</h3>
+    <h5 class="note">Note: 3 items is probably a bit too few for scrolling lazy load but I've put a bigger item height and a smaller container height</h5>
     <!-- we will get this DOM element and clone it and append to the storelist -->
     <div id="storetemplate" style="display:none">
         <div class="store row">
@@ -15,8 +17,13 @@
             <div class="col">Lat: ${latitude}, Lon: ${longitude}</div>
         </div>
     </div>
-    <div id="storeslist">
-        <!-- placeholder for generated stores html after evaluation with template and json data -->
+    <p>
+    <input type="text" id="search" class="searchbox" onkeyup="search()" placeholder="Search stores"/>
+    </p>
+    <div class="storeslist-container" id="container">
+      <div id="storeslist">
+          <!-- placeholder for generated stores html after evaluation with template and json data -->
+      </div>
     </div>
   </body>
 </html>
