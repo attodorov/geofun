@@ -9,7 +9,7 @@ http://localhost:8100/api/neareststores/<uk postcode>/<distance in km>
 
 example:
 
-http://localhost:8100/api/neareststores/BN149GB/50/10
+http://localhost:8100/api/neareststores/BN149GB/50
 
 #assumptions
 
