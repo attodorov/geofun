@@ -5,7 +5,7 @@ python server.py
 - (this will auto load index.html where there is a list of store location)
 - there is also UI to search based on a query string in real time with the respective 100 ms delay and 2 chars min. There's also lazy load in the UI as you scroll (for that i have decreased the height of the results container because 3 items don't usually fit the whole screen)
 - auto-complete/suggest and paging with a ui widget:
-http://localhost:8100/auto_suggest.html
+http://localhost:8100/html/auto_suggest.html
 (this one has dependency on jQuery UI - it's just the widget/library script that's loaded in the head)
 - the custom search (without any dependencies) in index.html sends the query string along with other params such as whether to do startsWith or contains
 - the auto_suggest widget is completely client-side, it loads the list once on load.

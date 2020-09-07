@@ -93,9 +93,11 @@ class StoresHandler(APIHandler):
             postcode_matches = []
             city_matches = []
             for store in self.storesextended:
+                added = False
                 if (contains_matching and query in store["postcode"].lower()) or store["postcode"].lower().startswith(query):
                     postcode_matches.append(store)
-                if (contains_matching and query in store["name"].lower()) or store["name"].lower().startswith(query):
+                    added = True
+                if (not added and contains_matching and query in store["name"].lower()) or store["name"].lower().startswith(query):
                     city_matches.append(store)
             # merge results such that postcodes are always sorted with priority 
             # on top of cities
